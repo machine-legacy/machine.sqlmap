@@ -7,18 +7,18 @@ namespace Machine.SqlMap
   public class Factory
   {
     readonly ConstructorInfo _info;
-    readonly Func<object[], object>[] _columnReaders;
+    readonly Func<object[], object>[] _readers;
 
-    public Factory(ConstructorInfo info, Func<object[], object>[] columnReaders)
+    public Factory(ConstructorInfo info, Func<object[], object>[] readers)
     {
       _info = info;
-      _columnReaders = columnReaders;
+      _readers = readers;
     }
 
     public object Create(object[] values)
     {
       List<object> parameters = new List<object>();
-      foreach (var reader in _columnReaders)
+      foreach (var reader in _readers)
       {
         parameters.Add(reader(values));
       }
