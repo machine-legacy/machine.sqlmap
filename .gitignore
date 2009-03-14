@@ -1,0 +1,11 @@
+*~
+*.user
+*.suo
+*.resharper
+*.swp
+*.sln.cache
+Build
+obj
+bin
+_ReSharper.*
+Specifications.html
