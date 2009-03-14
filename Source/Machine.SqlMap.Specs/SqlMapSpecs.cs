@@ -474,6 +474,7 @@ namespace Machine.SqlMap.Specs
     {
       Table table = new Table(columns);
       table.MapColumn("ChildId", "Child", children.ToDictionary(x => x.Id));
+      table.GroupBy = (row) => row[0];
       mapped = mapper.Map<OneToManyParentType>(table, rows).ToArray();
     };
 

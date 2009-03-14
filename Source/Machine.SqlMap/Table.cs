@@ -7,10 +7,17 @@ namespace Machine.SqlMap
   public class Table
   {
     readonly List<Column> _columns;
+    Func<object[], object> _groupBy;
 
     public IEnumerable<Column> Columns
     {
       get { return _columns; }
+    }
+
+    public Func<object[], object> GroupBy
+    {
+      get { return _groupBy; }
+      set { _groupBy = value; }
     }
 
     public Table(params Column[] columns)
@@ -21,7 +28,10 @@ namespace Machine.SqlMap
     public Column MapColumn<K, V>(string originalName, string newName, IDictionary<K, V> map)
     {
       Column original = FindByName(originalName);
-      Column column = new Column(newName, original.Ordinal, typeof(V), (k) => map[(K)k]);
+      Column column = new Column(newName, original.Ordinal, typeof(V), (k) => {
+        if (k is K) return map[(K)k];
+        throw new SqlMapException("Not casting " + k + " to " + typeof(K) + " for " + originalName + " to " + newName);
+      });
       _columns.Add(column);
       return column;
     }
