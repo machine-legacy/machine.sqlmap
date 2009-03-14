@@ -30,14 +30,6 @@ namespace Machine.SqlMap
       get { return _reader; }
     }
 
-    protected Column(string name, Int32 ordinal, Type type, Func<object[], object> reader)
-    {
-      _name = name;
-      _ordinal = ordinal;
-      _type = type;
-      _reader = reader;
-    }
-
     public Column(string name, Int32 ordinal, Type type, Func<object, object> map)
     {
       _name = name;
