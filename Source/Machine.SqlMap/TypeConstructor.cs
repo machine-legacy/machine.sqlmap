@@ -27,25 +27,9 @@ namespace Machine.SqlMap
       {
         throw new InvalidOperationException("Did not get equal number of Columns and Attributes");
       }
-      var readers = columns.Zip<ColumnAndTable, Attribute, Func<object[], object>>(_attributes, (c, a) => {
-        var column = c.Column;
-        if (typeof(DateTimeOffset) == a.Type && typeof(DateTime) == column.Type)
-        {
-          return (row) => new DateTimeOffset((DateTime)column.Read(row));
-        }
-        if (typeof(TimeSpan) == a.Type && typeof(Int64) == column.Type)
-        {
-          return (row) => new TimeSpan((Int64)column.Read(row));
-        }
-        if (a.Type.IsArray && !column.Type.IsArray)
-        {
-          return (row) => {
-            var array = Array.CreateInstance(column.Type, 1);
-            array.SetValue(column.Read(row), 0);
-            return array;
-          };
-        }
-        return column.Read;
+      var readers = columns.Zip<ColumnAndTable, Attribute, Func<object[], object>>(_attributes, (c, attribute) => {
+        var mapper = TypeMapping.MappingFor(c.Column, attribute);
+        return (row) => mapper(c.Column.Read(row));
       });
       return new Factory(_info, readers.ToArray());
     }
