@@ -31,11 +31,19 @@ namespace Machine.SqlMap
         var column = c.Column;
         if (typeof(DateTimeOffset) == a.Type && typeof(DateTime) == column.Type)
         {
-          return (reader) => new DateTimeOffset((DateTime)column.Read(reader));
+          return (row) => new DateTimeOffset((DateTime)column.Read(row));
         }
         if (typeof(TimeSpan) == a.Type && typeof(Int64) == column.Type)
         {
-          return (reader) => new TimeSpan((Int64)column.Read(reader));
+          return (row) => new TimeSpan((Int64)column.Read(row));
+        }
+        if (a.Type.IsArray && !column.Type.IsArray)
+        {
+          return (row) => {
+            var array = Array.CreateInstance(column.Type, 1);
+            array.SetValue(column.Read(row), 0);
+            return array;
+          };
         }
         return column.Read;
       });
