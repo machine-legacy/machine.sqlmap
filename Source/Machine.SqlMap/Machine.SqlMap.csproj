@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdoNetHelpers.cs" />
     <Compile Include="ArrayMappers.cs" />
     <Compile Include="Attribute.cs" />
     <Compile Include="Column.cs" />
