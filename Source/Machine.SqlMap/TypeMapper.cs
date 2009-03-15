@@ -5,12 +5,17 @@ namespace Machine.SqlMap
 {
   public class TypeMapper
   {
-    static readonly Dictionary<MappingKey, Func<object, object>> _mappings = new Dictionary<MappingKey, Func<object, object>>();
+    readonly Dictionary<MappingKey, Func<object, object>> _mappings = new Dictionary<MappingKey, Func<object, object>>();
 
-    static TypeMapper()
+    public TypeMapper()
     {
       _mappings[MappingKey.For<DateTime, DateTimeOffset>()] = (value) => new DateTimeOffset((DateTime)value);
       _mappings[MappingKey.For<Int64, TimeSpan>()] = (value) => new TimeSpan((Int64)value);
+    }
+
+    public void Map<K, V>(Func<K, V> map)
+    {
+      _mappings[MappingKey.For<K, V>()] = (k) => map((K)k);
     }
 
     public Func<object, object> MappingFor(Column column, Attribute attribute)
@@ -32,7 +37,7 @@ namespace Machine.SqlMap
       };
     }
 
-    private static Func<object, object> MapTypes(Column column, Attribute attribute)
+    private Func<object, object> MapTypes(Column column, Attribute attribute)
     {
       MappingKey key = new MappingKey(column.Type, attribute.Type);
       if (_mappings.ContainsKey(key))
