@@ -33,16 +33,7 @@ namespace Machine.SqlMap
     }
   }
 
-  public static class Mappings
-  {
-    public static IEnumerable<ColumnAndTable> ToColumnsAndTables(this IProjectedTable projected)
-    {
-      Table joinedTable = projected.ToTable();
-      return joinedTable.Columns.Select(c => new ColumnAndTable(joinedTable, c, projected));
-    }
-  }
-
-  public class TypeAttributes
+  public class MappableType
   {
     readonly TypeConstructor[] _constructors;
 
@@ -51,15 +42,14 @@ namespace Machine.SqlMap
       get { return _constructors; }
     }
 
-    public TypeAttributes(TypeConstructor[] constructors)
+    public MappableType(TypeConstructor[] constructors)
     {
       _constructors = constructors;
     }
 
-    public MappedConstructor MapToConstructor(IProjectedTable table)
+    public MappedConstructor MapToConstructor(IEnumerable<ColumnAndTable> columnsAndTables)
     {
       var error = new ErrorBuilder();
-      var columnsAndTables = table.ToColumnsAndTables();
       var columnsByName = columnsAndTables.ToDictionary(x => x.Column.Name.ToUpper());
       foreach (TypeConstructor ctor in _constructors)
       {
@@ -84,14 +74,14 @@ namespace Machine.SqlMap
       throw error.Create();
     }
 
-    public static TypeAttributes For(Type type)
+    public static MappableType For(Type type)
     {
       var ctors = type.GetConstructors().Select(
         ctor => new TypeConstructor(ctor,
           ctor.GetParameters().Select(x => new Attribute(x.Name, x.ParameterType)).ToArray()
         )
       );
-      return new TypeAttributes(ctors.ToArray());
+      return new MappableType(ctors.ToArray());
     }
   }
 

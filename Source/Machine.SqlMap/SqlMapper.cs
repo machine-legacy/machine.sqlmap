@@ -36,9 +36,10 @@ namespace Machine.SqlMap
 
     public IEnumerable<object> Map(Type mappedType, IProjectedTable projectedTable)
     {
-      TypeAttributes attributes = TypeAttributes.For(mappedType);
+      MappableType attributes = MappableType.For(mappedType);
       Table table = projectedTable.ToTable();
-      Factory factory = attributes.MapToConstructor(projectedTable).ToFactory(_typeMapper);
+      IEnumerable<ColumnAndTable> columnsAndTables = table.ToColumnsAndTables(projectedTable);
+      Factory factory = attributes.MapToConstructor(columnsAndTables).ToFactory(_typeMapper);
       var rows = projectedTable.Rows();
       if (table.GroupBy != null)
       {

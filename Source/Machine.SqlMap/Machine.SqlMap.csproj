@@ -52,7 +52,7 @@
     <Compile Include="SqlMapper.cs" />
     <Compile Include="StaticTable.cs" />
     <Compile Include="Table.cs" />
-    <Compile Include="TypeAttributes.cs" />
+    <Compile Include="MappableType.cs" />
     <Compile Include="TypeConstructor.cs" />
     <Compile Include="TypeMapper.cs" />
     <Compile Include="ZipHelpers.cs" />

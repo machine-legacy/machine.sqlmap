@@ -9,11 +9,6 @@ namespace Machine.SqlMap
     readonly List<Column> _columns;
     Func<object[], object> _groupBy;
 
-    public IEnumerable<Column> Columns
-    {
-      get { return _columns; }
-    }
-
     public Func<object[], object> GroupBy
     {
       get { return _groupBy; }
@@ -45,6 +40,11 @@ namespace Machine.SqlMap
     public Column FindByName(string name)
     {
       return _columns.Where(x => x.Name.Equals(name)).Single();
+    }
+
+    public IEnumerable<ColumnAndTable> ToColumnsAndTables(IProjectedTable projected)
+    {
+      return _columns.Select(c => new ColumnAndTable(this, c, projected));
     }
   }
 }
