@@ -15,6 +15,25 @@ namespace Machine.SqlMap
 
     public static Func<object, object> MappingFor(Column column, Attribute attribute)
     {
+      var mapTypes = MapTypes(column, attribute);
+      var mapArrays = MapArrays(column, attribute);
+      return (value) => mapArrays(mapTypes(value));
+    }
+
+    private static Func<object, object> MapArrays(Column column, Attribute attribute)
+    {
+      if (!attribute.Type.IsArray)
+      {
+        return (value) => value;
+      }
+      return (source) =>
+      {
+        return ((Array)source).Select<object>(attribute.Type.GetElementType(), (value) => value);
+      };
+    }
+
+    private static Func<object, object> MapTypes(Column column, Attribute attribute)
+    {
       MappingKey key = new MappingKey(column.Type, attribute.Type);
       if (_mappings.ContainsKey(key))
       {

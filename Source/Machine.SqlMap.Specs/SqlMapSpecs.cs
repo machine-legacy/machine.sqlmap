@@ -444,6 +444,72 @@ namespace Machine.SqlMap.Specs
   }
 
   [Subject("Sql Projector")]
+  public class with_type_that_has_one_to_many_strings : SqlProjectorSpecs
+  {
+    static OneToManyOfStrings[] mapped;
+
+    Establish context = () =>
+    {
+      columns = new[] {
+        new Column("Id", 0, typeof(Int32)),
+        new Column("Name", 1, typeof(string)),
+        new Column("Key", 2, typeof(string))
+      };
+      rows = new [] {
+        new object[] { 1, "A", "a" },
+        new object[] { 1, "A", "b" },
+        new object[] { 2, "C", "a" },
+        new object[] { 2, "C", "b" },
+        new object[] { 2, "C", "c" }
+      };
+    };
+    
+    Because of = () =>
+    {
+      Table table = new Table(columns);
+      table.GroupBy = (row) => row[0];
+      mapped = mapper.Map<OneToManyOfStrings>(table, rows).ToArray();
+    };
+
+    It should_return_an_instance_for_each_row = () =>
+      mapped.Count().ShouldEqual(2);
+
+    It should_set_first_instances_name = () =>
+      mapped[0].Name.ShouldEqual("A");
+
+    It should_set_second_instances_name = () =>
+      mapped[1].Name.ShouldEqual("C");
+
+    It should_set_first_instances_children = () =>
+      mapped[0].Keys.ShouldContainOnly("a", "b");
+
+    It should_set_second_instances_children = () =>
+      mapped[1].Keys.ShouldContainOnly("a", "b", "c");
+  }
+
+  public class OneToManyOfStrings
+  {
+    readonly string _name;
+    readonly string[] _keys;
+
+    public string Name
+    {
+      get { return _name; }
+    }
+
+    public string[] Keys
+    {
+      get { return _keys; }
+    }
+
+    public OneToManyOfStrings(string name, string[] key)
+    {
+      _name = name;
+      _keys = key;
+    }
+  }
+
+  [Subject("Sql Projector")]
   public class with_type_that_has_one_to_many_foreign_key_to_another_type : SqlProjectorSpecs
   {
     static OneToManyParentType[] mapped;

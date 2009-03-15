@@ -29,6 +29,12 @@ namespace Machine.SqlMap
     {
       Column original = FindByName(originalName);
       Column column = new Column(newName, original.Ordinal, typeof(V), (k) => {
+        if (k is Array)
+        {
+          return ((Array)k).Select<K>(typeof (V), (value) => {
+            return map[value];
+          });
+        }
         if (k is K) return map[(K)k];
         throw new SqlMapException("Not casting " + k + " to " + typeof(K) + " for " + originalName + " to " + newName);
       });
