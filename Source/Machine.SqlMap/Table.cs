@@ -20,6 +20,13 @@ namespace Machine.SqlMap
       _columns = columns.OrderBy(x => x.Ordinal).ToList();
     }
 
+    public void RenameColumn(string originalName, string newName)
+    {
+      Column original = FindByName(originalName);
+      Column column = new Column(newName, original.Ordinal, original.Type);
+      _columns.Add(column);
+    }
+
     public Column MapColumn<K, V>(string originalName, string newName, IDictionary<K, V> map)
     {
       Column original = FindByName(originalName);
