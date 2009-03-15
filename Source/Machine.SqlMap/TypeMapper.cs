@@ -21,19 +21,18 @@ namespace Machine.SqlMap
     public Func<object, object> MappingFor(Column column, Attribute attribute)
     {
       var mapTypes = MapTypes(column, attribute);
-      var mapArrays = MapArrays(column, attribute);
-      return (value) => mapArrays(mapTypes(value));
+      return MapArrays(column, attribute, mapTypes);
     }
 
-    private static Func<object, object> MapArrays(Column column, Attribute attribute)
+    private static Func<object, object> MapArrays(Column column, Attribute attribute, Func<object, object> typeMapper)
     {
       if (!attribute.Type.IsArray)
       {
-        return (value) => value;
+        return typeMapper;
       }
       return (source) =>
       {
-        return ((Array)source).Select<object>(attribute.Type.GetElementType(), (value) => value);
+        return ((Array)source).Select(attribute.Type.GetElementType(), typeMapper);
       };
     }
 
@@ -53,6 +52,18 @@ namespace Machine.SqlMap
     readonly Type _columnType;
     readonly Type _attributeType;
 
+    protected Type AttributeTypeOrItsElementType
+    {
+      get
+      {
+        if (_attributeType.HasElementType)
+        {
+          return _attributeType.GetElementType();
+        }
+        return _attributeType;
+      }
+    }
+
     public MappingKey(Type columnType, Type attributeType)
     {
       _columnType = columnType;
@@ -63,7 +74,7 @@ namespace Machine.SqlMap
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(other._columnType, _columnType) && Equals(other._attributeType, _attributeType);
+      return Equals(other._columnType, _columnType) && Equals(other.AttributeTypeOrItsElementType, AttributeTypeOrItsElementType);
     }
 
     public override bool Equals(object obj)
@@ -76,7 +87,7 @@ namespace Machine.SqlMap
 
     public override Int32 GetHashCode()
     {
-      return _columnType.GetHashCode() ^ _attributeType.GetHashCode();
+      return _columnType.GetHashCode() ^ AttributeTypeOrItsElementType.GetHashCode();
     }
 
     public static MappingKey For<C, A>()
