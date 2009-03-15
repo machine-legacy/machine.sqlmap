@@ -56,7 +56,7 @@ namespace Machine.SqlMap
       _constructors = constructors;
     }
 
-    public Factory ToFactory(IProjectedTable table)
+    public Factory ToFactory(IProjectedTable table, TypeMapper typeMapper)
     {
       var error = new ErrorBuilder();
       var columnsAndTables = table.ToColumnsAndTables();
@@ -78,7 +78,7 @@ namespace Machine.SqlMap
         }
         if (!error.HasErrors)
         {
-          return ctor.ToFactory(columns);
+          return ctor.ToFactory(columns, typeMapper);
         }
       }
       throw error.Create();

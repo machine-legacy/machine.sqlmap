@@ -53,7 +53,7 @@
     <Compile Include="Table.cs" />
     <Compile Include="TypeAttributes.cs" />
     <Compile Include="TypeConstructor.cs" />
-    <Compile Include="TypeMapping.cs" />
+    <Compile Include="TypeMapper.cs" />
     <Compile Include="ZipHelpers.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

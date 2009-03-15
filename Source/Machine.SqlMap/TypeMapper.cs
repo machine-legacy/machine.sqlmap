@@ -3,17 +3,17 @@ using System.Collections.Generic;
 
 namespace Machine.SqlMap
 {
-  public static class TypeMapping
+  public class TypeMapper
   {
     static readonly Dictionary<MappingKey, Func<object, object>> _mappings = new Dictionary<MappingKey, Func<object, object>>();
 
-    static TypeMapping()
+    static TypeMapper()
     {
       _mappings[MappingKey.For<DateTime, DateTimeOffset>()] = (value) => new DateTimeOffset((DateTime)value);
       _mappings[MappingKey.For<Int64, TimeSpan>()] = (value) => new TimeSpan((Int64)value);
     }
 
-    public static Func<object, object> MappingFor(Column column, Attribute attribute)
+    public Func<object, object> MappingFor(Column column, Attribute attribute)
     {
       var mapTypes = MapTypes(column, attribute);
       var mapArrays = MapArrays(column, attribute);

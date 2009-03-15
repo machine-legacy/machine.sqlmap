@@ -7,6 +7,18 @@ namespace Machine.SqlMap
 {
   public class SqlMapper
   {
+    readonly TypeMapper _typeMapper;
+
+    public SqlMapper()
+      : this(new TypeMapper())
+    {
+    }
+
+    public SqlMapper(TypeMapper typeMapper)
+    {
+      _typeMapper = typeMapper;
+    }
+
     public IEnumerable<T> Map<T>(Table table, object[][] rows)
     {
       return Map<T>(new StaticTable(table, rows));
@@ -26,7 +38,7 @@ namespace Machine.SqlMap
     {
       TypeAttributes attributes = TypeAttributes.For(mappedType);
       Table table = projectedTable.ToTable();
-      Factory factory = attributes.ToFactory(projectedTable);
+      Factory factory = attributes.ToFactory(projectedTable, _typeMapper);
       var rows = projectedTable.Rows();
       if (table.GroupBy != null)
       {
