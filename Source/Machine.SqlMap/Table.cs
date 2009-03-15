@@ -15,6 +15,11 @@ namespace Machine.SqlMap
       set { _groupBy = value; }
     }
 
+    public IEnumerable<Column> Columns
+    {
+      get { return _columns; }
+    }
+
     public Table(params Column[] columns)
     {
       _columns = columns.OrderBy(x => x.Ordinal).ToList();
@@ -30,11 +35,6 @@ namespace Machine.SqlMap
     public Column FindByName(string name)
     {
       return _columns.Where(x => x.Name.Equals(name)).Single();
-    }
-
-    public IEnumerable<ColumnAndTable> ToColumnsAndTables(IProjectedTable projected)
-    {
-      return _columns.Select(c => new ColumnAndTable(this, c, projected));
     }
   }
 }

@@ -7,9 +7,9 @@ namespace Machine.SqlMap
   public class MappedConstructor
   {
     readonly TypeConstructor _typeConstructor;
-    readonly ColumnAndTable[] _columns;
+    readonly Column[] _columns;
 
-    public MappedConstructor(TypeConstructor typeConstructor, IEnumerable<ColumnAndTable> columns)
+    public MappedConstructor(TypeConstructor typeConstructor, IEnumerable<Column> columns)
     {
       _typeConstructor = typeConstructor;
       _columns = columns.ToArray();

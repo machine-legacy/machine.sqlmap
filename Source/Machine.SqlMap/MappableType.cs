@@ -4,35 +4,6 @@ using System.Linq;
 
 namespace Machine.SqlMap
 {
-  public class ColumnAndTable
-  {
-    readonly Table _table;
-    readonly Column _column;
-    readonly IProjectedTable _projectedTable;
-
-    public Table Table
-    {
-      get { return _table; }
-    }
-
-    public Column Column
-    {
-      get { return _column; }
-    }
-
-    public IProjectedTable ProjectedTable
-    {
-      get { return _projectedTable; }
-    }
-
-    public ColumnAndTable(Table table, Column column, IProjectedTable projectedTable)
-    {
-      _table = table;
-      _projectedTable = projectedTable;
-      _column = column;
-    }
-  }
-
   public class MappableType
   {
     readonly TypeConstructor[] _constructors;
@@ -47,13 +18,13 @@ namespace Machine.SqlMap
       _constructors = constructors;
     }
 
-    public MappedConstructor MapToConstructor(IEnumerable<ColumnAndTable> columnsAndTables)
+    public MappedConstructor MapToConstructor(IEnumerable<Column> columns)
     {
       var error = new ErrorBuilder();
-      var columnsByName = columnsAndTables.ToDictionary(x => x.Column.Name.ToUpper());
+      var columnsByName = columns.ToDictionary(x => x.Name.ToUpper());
       foreach (TypeConstructor ctor in _constructors)
       {
-        var columns = new List<ColumnAndTable>();
+        var selectedColumns = new List<Column>();
         foreach (var attribute in ctor.Attributes)
         {
           var key = attribute.Name.ToUpper();
@@ -63,12 +34,12 @@ namespace Machine.SqlMap
           }
           else
           {
-            columns.Add(columnsByName[key]);
+            selectedColumns.Add(columnsByName[key]);
           }
         }
         if (!error.HasErrors)
         {
-          return new MappedConstructor(ctor, columns);
+          return new MappedConstructor(ctor, selectedColumns);
         }
       }
       throw error.Create();

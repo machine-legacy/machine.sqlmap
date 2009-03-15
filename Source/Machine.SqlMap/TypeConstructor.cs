@@ -21,15 +21,15 @@ namespace Machine.SqlMap
       _attributes = attributes;
     }
 
-    public Factory ToFactory(IEnumerable<ColumnAndTable> columns, TypeMapper typeMapper)
+    public Factory ToFactory(IEnumerable<Column> columns, TypeMapper typeMapper)
     {
       if (columns.Count() != _attributes.Count())
       {
         throw new InvalidOperationException("Did not get equal number of Columns and Attributes");
       }
-      var readers = columns.Zip<ColumnAndTable, Attribute, Func<object[], object>>(_attributes, (c, attribute) => {
-        var mapper = typeMapper.MappingFor(c.Column, attribute);
-        return (row) => mapper(c.Column.Read(row));
+      var readers = columns.Zip<Column, Attribute, Func<object[], object>>(_attributes, (column, attribute) => {
+        var mapper = typeMapper.MappingFor(column, attribute);
+        return (row) => mapper(column.Read(row));
       });
       return new Factory(_info, readers.ToArray());
     }

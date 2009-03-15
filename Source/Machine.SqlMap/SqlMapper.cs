@@ -38,8 +38,7 @@ namespace Machine.SqlMap
     {
       MappableType attributes = MappableType.For(mappedType);
       Table table = projectedTable.ToTable();
-      IEnumerable<ColumnAndTable> columnsAndTables = table.ToColumnsAndTables(projectedTable);
-      Factory factory = attributes.MapToConstructor(columnsAndTables).ToFactory(_typeMapper);
+      Factory factory = attributes.MapToConstructor(table.Columns).ToFactory(_typeMapper);
       var rows = projectedTable.Rows();
       if (table.GroupBy != null)
       {
