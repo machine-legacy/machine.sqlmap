@@ -25,20 +25,17 @@ namespace Machine.SqlMap
 
     public Func<object, object> MappingFor(Column column, Attribute attribute)
     {
-      var mapTypes = MapTypes(column, attribute);
-      return MapArrays(column, attribute, mapTypes);
+      return MapTypesAndArrays(column, attribute);
     }
 
-    private static Func<object, object> MapArrays(Column column, Attribute attribute, Func<object, object> typeMapper)
+    private Func<object, object> MapTypesAndArrays(Column column, Attribute attribute)
     {
+      var typeMapper = MapTypes(column, attribute);
       if (!attribute.Type.IsArray)
       {
         return typeMapper;
       }
-      return (source) =>
-      {
-        return ((Array)source).Select(attribute.Type.GetElementType(), typeMapper);
-      };
+      return (source) => ((Array)source).Select(attribute.Type.GetElementType(), typeMapper);
     }
 
     private Func<object, object> MapTypes(Column column, Attribute attribute)
