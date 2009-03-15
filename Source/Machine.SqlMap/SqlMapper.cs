@@ -38,7 +38,7 @@ namespace Machine.SqlMap
     {
       TypeAttributes attributes = TypeAttributes.For(mappedType);
       Table table = projectedTable.ToTable();
-      Factory factory = attributes.ToFactory(projectedTable, _typeMapper);
+      Factory factory = attributes.MapToConstructor(projectedTable).ToFactory(_typeMapper);
       var rows = projectedTable.Rows();
       if (table.GroupBy != null)
       {
