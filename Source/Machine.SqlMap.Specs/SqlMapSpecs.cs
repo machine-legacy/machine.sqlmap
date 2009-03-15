@@ -383,9 +383,8 @@ namespace Machine.SqlMap.Specs
 
     Because of = () =>
     {
-      var dictionary = children.ToDictionary(x => x.Id);
       TypeMapper typeMapper = new TypeMapper();
-      typeMapper.Map<Int32, ChildType>(k => dictionary[k]);
+      typeMapper.Map(children.ToDictionary(x => x.Id));
       mapper = new SqlMapper(typeMapper);
       Table table = new Table(columns);
       table.RenameColumn("ChildId", "Child");
@@ -542,9 +541,8 @@ namespace Machine.SqlMap.Specs
     
     Because of = () =>
     {
-      var dictionary = children.ToDictionary(x => x.Id);
       TypeMapper typeMapper = new TypeMapper();
-      typeMapper.Map<Int32, ChildType>(k => dictionary[k]);
+      typeMapper.Map(children.ToDictionary(x => x.Id));
       mapper = new SqlMapper(typeMapper);
       Table table = new Table(columns);
       table.GroupBy = (row) => row[0];

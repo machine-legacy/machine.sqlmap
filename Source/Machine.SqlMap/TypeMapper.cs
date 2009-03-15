@@ -18,6 +18,11 @@ namespace Machine.SqlMap
       _mappings[MappingKey.For<K, V>()] = (k) => map((K)k);
     }
 
+    public void Map<K, V>(IDictionary<K, V> map)
+    {
+      _mappings[MappingKey.For<K, V>()] = (k) => map[(K)k];
+    }
+
     public Func<object, object> MappingFor(Column column, Attribute attribute)
     {
       var mapTypes = MapTypes(column, attribute);
