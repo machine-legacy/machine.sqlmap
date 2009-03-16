@@ -35,7 +35,7 @@ namespace Machine.SqlMap
       {
         return typeMapper;
       }
-      return (source) => ((Array)source).Select(attribute.Type.GetElementType(), typeMapper);
+      return (source) => source.CastOrWrapInArray().Select(attribute.Type.GetElementType(), typeMapper);
     }
 
     private Func<object, object> MapTypes(Column column, Attribute attribute)

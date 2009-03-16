@@ -447,6 +447,49 @@ namespace Machine.SqlMap.Specs
   }
 
   [Subject("Sql Projector")]
+  public class with_type_that_has_one_to_many_strings_with_no_grouping : SqlProjectorSpecs
+  {
+    static OneToManyOfStrings[] mapped;
+
+    Establish context = () =>
+    {
+      columns = new[] {
+        new Column("Id", 0, typeof(Int32)),
+        new Column("Name", 1, typeof(string)),
+        new Column("Key", 2, typeof(string))
+      };
+      rows = new [] {
+        new object[] { 1, "A", "a" },
+        new object[] { 1, "A", "b" },
+        new object[] { 2, "C", "a" },
+        new object[] { 2, "C", "b" },
+        new object[] { 2, "C", "c" }
+      };
+    };
+    
+    Because of = () =>
+    {
+      Table table = new Table(columns);
+      mapped = mapper.Map<OneToManyOfStrings>(table, rows).ToArray();
+    };
+
+    It should_return_an_instance_for_each_row = () =>
+      mapped.Count().ShouldEqual(5);
+
+    It should_set_first_instances_name = () =>
+      mapped[0].Name.ShouldEqual("A");
+
+    It should_set_second_instances_name = () =>
+      mapped[2].Name.ShouldEqual("C");
+
+    It should_set_first_instances_children = () =>
+      mapped[0].Keys.ShouldContainOnly("a");
+
+    It should_set_second_instances_children = () =>
+      mapped[2].Keys.ShouldContainOnly("a");
+  }
+
+  [Subject("Sql Projector")]
   public class with_type_that_has_one_to_many_strings : SqlProjectorSpecs
   {
     static OneToManyOfStrings[] mapped;
@@ -512,6 +555,58 @@ namespace Machine.SqlMap.Specs
     }
   }
 
+  [Subject("Sql Projector")]
+  public class with_type_that_has_one_to_many_foreign_key_to_another_type_with_no_grouping : SqlProjectorSpecs
+  {
+    static OneToManyParentType[] mapped;
+    static ChildType[] children;
+
+    Establish context = () =>
+    {
+      columns = new[] {
+        new Column("Id", 0, typeof(Int32)),
+        new Column("Name", 1, typeof(string)),
+        new Column("ChildId", 2, typeof(Int32))
+      };
+      rows = new [] {
+        new object[] { 1, "A", 1 },
+        new object[] { 1, "A", 2 },
+        new object[] { 2, "C", 2 },
+        new object[] { 2, "C", 1 },
+        new object[] { 2, "C", 3 }
+      };
+      children = new[] {
+        new ChildType(1, "Jacob"), 
+        new ChildType(2, "Andrea"), 
+        new ChildType(3, "Tomorrow"), 
+      };
+    };
+    
+    Because of = () =>
+    {
+      TypeMapper typeMapper = new TypeMapper();
+      typeMapper.Map(children.ToDictionary(x => x.Id));
+      mapper = new SqlMapper(typeMapper);
+      Table table = new Table(columns);
+      table.RenameColumn("ChildId", "Child");
+      mapped = mapper.Map<OneToManyParentType>(table, rows).ToArray();
+    };
+
+    It should_return_an_instance_for_each_row = () =>
+      mapped.Count().ShouldEqual(5);
+
+    It should_set_first_instances_name = () =>
+      mapped[0].Name.ShouldEqual("A");
+
+    It should_set_second_instances_name = () =>
+      mapped[2].Name.ShouldEqual("C");
+
+    It should_set_first_instances_children = () =>
+      mapped[0].Children.ShouldContainOnly(children[0]);
+
+    It should_set_second_instances_children = () =>
+      mapped[2].Children.ShouldContainOnly(children[1]);
+  }
   [Subject("Sql Projector")]
   public class with_type_that_has_one_to_many_foreign_key_to_another_type : SqlProjectorSpecs
   {

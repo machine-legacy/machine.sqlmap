@@ -13,5 +13,13 @@ namespace Machine.SqlMap
       }
       return destiny; 
     }
+
+    public static Array CastOrWrapInArray(this object obj)
+    {
+      if (obj is Array) return (Array)obj;
+      var objectArray = Array.CreateInstance(typeof (Object), 1);
+      objectArray.SetValue(obj, 0);
+      return objectArray;
+    }
   }
 }
