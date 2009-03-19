@@ -607,6 +607,7 @@ namespace Machine.SqlMap.Specs
     It should_set_second_instances_children = () =>
       mapped[2].Children.ShouldContainOnly(children[1]);
   }
+
   [Subject("Sql Projector")]
   public class with_type_that_has_one_to_many_foreign_key_to_another_type : SqlProjectorSpecs
   {
