@@ -7,12 +7,12 @@ namespace Machine.SqlMap
 {
   public static class MultiQueryHelpers
   {
-    public static MappedSqlMultiQuery CreateQuery(this IDbConnection connection)
+    public static MappedSqlMultiQuery CreateSqlMapQuery(this IDbConnection connection)
     {
-      return CreateQuery(connection, null);
+      return CreateSqlMapQuery(connection, null);
     }
 
-    public static MappedSqlMultiQuery CreateQuery(this IDbConnection connection, IDbTransaction transaction)
+    public static MappedSqlMultiQuery CreateSqlMapQuery(this IDbConnection connection, IDbTransaction transaction)
     {
       return new MappedSqlMultiQuery(connection, transaction);
     }

@@ -42,7 +42,7 @@ namespace Machine.SqlMap
 
     Because of = () =>
     {
-      var query = connection.CreateQuery();
+      var query = connection.CreateSqlMapQuery();
       people = query.Add<Person>("SELECT EmployeeId AS Id, FirstName, LastName, BirthDate FROM Employees").ToEnumerable().ToArray();
     };
 
@@ -58,7 +58,7 @@ namespace Machine.SqlMap
 
     Because of = () =>
     {
-      var query = connection.CreateQuery();
+      var query = connection.CreateSqlMapQuery();
       var firstQuery = query.Add<Person>("SELECT EmployeeId AS Id, FirstName, LastName, BirthDate FROM Employees");
       var secondQuery = query.Add<Person>("SELECT EmployeeId AS Id, FirstName, LastName, BirthDate FROM Employees");
       first = firstQuery.ToEnumerable().ToArray();
@@ -79,7 +79,7 @@ namespace Machine.SqlMap
 
     Because of = () =>
     {
-      var query = connection.CreateQuery();
+      var query = connection.CreateSqlMapQuery();
       var people = query.Add<Person>("SELECT EmployeeId AS Id, FirstName, LastName, BirthDate FROM Employees").ToEnumerable();
       error = Catch.Exception(() => query.Add<Person>("SELECT EmployeeId AS Id, FirstName, LastName, BirthDate FROM Employees"));
     };
