@@ -38,6 +38,7 @@ namespace Machine.SqlMap
     readonly IDbConnection _connection;
     readonly IDbTransaction _transaction;
     readonly List<ISubQuery> _queries = new List<ISubQuery>();
+    readonly List<Action<IDbCommand>> _addParameters = new List<Action<IDbCommand>>();
     readonly SqlCollector _sqlCollector = new SqlCollector();
     readonly TypeMapper _typeMapper;
     readonly SqlMapper _sqlMapper;
@@ -49,6 +50,11 @@ namespace Machine.SqlMap
       _transaction = transaction;
       _typeMapper = new TypeMapper();
       _sqlMapper = new SqlMapper(_typeMapper);
+    }
+
+    public void AddParameter<T>(string name, DbType type, T value)
+    {
+      _addParameters.Add(c => c.AddParameter(name, type, value));
     }
 
     public SqlQuery<T> Add<T>(string sql)
@@ -78,8 +84,12 @@ namespace Machine.SqlMap
       var command = _connection.CreateCommand();
       command.Transaction = _transaction;
       command.CommandText = _sqlCollector.ToSingleQuery();
-      IEnumerator<ISubQuery> enumerator = _queries.GetEnumerator();
-      using (IDataReader reader = command.ExecuteReader())
+      foreach (var action in _addParameters)
+      {
+        action(command);
+      }
+      var enumerator = _queries.GetEnumerator();
+      using (var reader = command.ExecuteReader())
       {
         do
         {
