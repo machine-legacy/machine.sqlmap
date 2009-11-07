@@ -9,3 +9,5 @@ obj
 bin
 _ReSharper.*
 Specifications.html
+.setup-done
+Specs
