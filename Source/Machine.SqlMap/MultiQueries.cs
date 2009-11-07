@@ -9,7 +9,12 @@ namespace Machine.SqlMap
   {
     public static MappedSqlMultiQuery CreateQuery(this IDbConnection connection)
     {
-      return new MappedSqlMultiQuery(connection);
+      return CreateQuery(connection, null);
+    }
+
+    public static MappedSqlMultiQuery CreateQuery(this IDbConnection connection, IDbTransaction transaction)
+    {
+      return new MappedSqlMultiQuery(connection, transaction);
     }
   }
 
@@ -31,15 +36,17 @@ namespace Machine.SqlMap
   public class MappedSqlMultiQuery
   {
     readonly IDbConnection _connection;
+    readonly IDbTransaction _transaction;
     readonly List<ISubQuery> _queries = new List<ISubQuery>();
     readonly SqlCollector _sqlCollector = new SqlCollector();
     readonly TypeMapper _typeMapper;
     readonly SqlMapper _sqlMapper;
     bool _read;
 
-    public MappedSqlMultiQuery(IDbConnection connection)
+    public MappedSqlMultiQuery(IDbConnection connection, IDbTransaction transaction)
     {
       _connection = connection;
+      _transaction = transaction;
       _typeMapper = new TypeMapper();
       _sqlMapper = new SqlMapper(_typeMapper);
     }
@@ -68,7 +75,8 @@ namespace Machine.SqlMap
 
     public void CreateAndExecute()
     {
-      IDbCommand command = _connection.CreateCommand();
+      var command = _connection.CreateCommand();
+      command.Transaction = _transaction;
       command.CommandText = _sqlCollector.ToSingleQuery();
       IEnumerator<ISubQuery> enumerator = _queries.GetEnumerator();
       using (IDataReader reader = command.ExecuteReader())
