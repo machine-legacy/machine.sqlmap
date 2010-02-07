@@ -35,8 +35,7 @@ namespace Machine.SqlMap
 
   public class MappedSqlMultiQuery
   {
-    readonly IDbConnection _connection;
-    readonly IDbTransaction _transaction;
+    readonly Func<IDbCommand> _createCommand;
     readonly List<ISubQuery> _queries = new List<ISubQuery>();
     readonly List<Action<IDbCommand>> _addParameters = new List<Action<IDbCommand>>();
     readonly SqlCollector _sqlCollector = new SqlCollector();
@@ -44,12 +43,20 @@ namespace Machine.SqlMap
     readonly SqlMapper _sqlMapper;
     bool _read;
 
-    public MappedSqlMultiQuery(IDbConnection connection, IDbTransaction transaction)
+    public MappedSqlMultiQuery(Func<IDbCommand> createCommand)
     {
-      _connection = connection;
-      _transaction = transaction;
+      _createCommand = createCommand;
       _typeMapper = new TypeMapper();
       _sqlMapper = new SqlMapper(_typeMapper);
+    }
+
+    public MappedSqlMultiQuery(IDbConnection connection, IDbTransaction transaction)
+      : this(() => {
+      var command = connection.CreateCommand();
+      command.Transaction = transaction;
+      return command;
+    })
+    {
     }
 
     public void AddParameter<T>(string name, DbType type, T value)
@@ -81,8 +88,7 @@ namespace Machine.SqlMap
 
     public void CreateAndExecute()
     {
-      var command = _connection.CreateCommand();
-      command.Transaction = _transaction;
+      var command = _createCommand();
       command.CommandText = _sqlCollector.ToSingleQuery();
       foreach (var action in _addParameters)
       {
